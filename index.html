@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+<head>
+  <title>Crypto AES JavaScript - PHP</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+
+
+  <!-- CryptoJS AES Library -->
+  <script src="CryptoJSv3.1.2/rollups/aes.js"></script>
+  <!-- JQuery Library -->
+  <script src="jquery-3.1.0.min.js"></script>
+
+</head>
+
+<body>
+
+
+  <script type="text/javascript">
+    $( document ).ready(function() {
+      console.log( "ready!" );
+      function sendMyData() {
+        // get data
+        var username = "Sebaxtian";
+        var password = "Contraseña";
+         /**
+          * Shortcut function to the hasher's object interface.
+          *
+          * @param {WordArray|string} message The message to hash.
+          *
+          * @return {WordArray} The hash.
+          *
+          * @static
+          *
+          * @example
+          *
+          *     var hash = CryptoJS.MD5('message');
+          *     var hash = CryptoJS.MD5(wordArray);
+          */
+        var hash = CryptoJS.MD5("CryptoKEY").toString();
+        console.log("hash = " +  hash);
+        /**
+         * Shortcut functions to the cipher's object interface.
+         *
+         *     @example
+         *
+         *     var ciphertext = CryptoJS.AES.encrypt(message, key, cfg);
+         *     var plaintext  = CryptoJS.AES.decrypt(ciphertext, key, cfg);
+         */
+        var json_obj = {"username": username, "password": password };
+        var mensajePlano = JSON.stringify(json_obj);
+        console.log("Mensaje Plano: " + mensajePlano);
+
+        var mensajeEncriptado = CryptoJS.AES.encrypt(mensajePlano, hash).toString();
+        console.log("Mensaje Encriptado: " + mensajeEncriptado);
+
+        var plaintext  = CryptoJS.AES.decrypt(mensajeEncriptado, hash);
+        console.log("Mensaje Desencriptado En El Cliente: " + plaintext.toString(CryptoJS.enc.Utf8));
+
+        // send data
+        var jqxhr = $.ajax( {
+          method: "POST",
+          url: "myserver.php",
+          data: { cryption: mensajeEncriptado }
+        } )
+        .done(function(msg) {
+          console.log("Mensaje Desencriptado En El Servidor: " + msg);
+        })
+        .fail(function(jqXHR, textStatus) {
+          console.log("Peticion al servidor Falla " + textStatus);
+        });
+
+      }
+      sendMyData();
+    });
+  </script>
+
+</body>
+
+</html>
